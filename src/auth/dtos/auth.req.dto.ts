@@ -67,7 +67,7 @@ export class SignInReqDto {
   @ApiProperty({
     type: 'string',
     description: 'Email of the user',
-    example: 'user@example.com',
+    example: 'wilb@example.com',
   })
   @IsString()
   @IsEmail({}, { message: 'Invalid email format' })
@@ -77,6 +77,7 @@ export class SignInReqDto {
   @ApiProperty({
     type: 'string',
     description: 'Password user entered when setting the account',
+    example: 'Password@123',
   })
   @IsString()
   @IsNotEmpty({ message: 'Password should be provided' })

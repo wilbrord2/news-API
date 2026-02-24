@@ -3,8 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Readlog } from './entities/readlog.entity';
 import { AnalyticsService } from '../analytics/analytics.service';
-import { CreateReadlogDto } from './dto/create-readlog.dto';
-import { UpdateReadlogDto } from './dto/update-readlog.dto';
+
 
 @Injectable()
 export class ReadlogService {
@@ -84,24 +83,4 @@ export class ReadlogService {
     });
   }
 
-  create(_createReadlogDto: CreateReadlogDto) {
-    return 'This action adds a new readlog';
-  }
-
-  findAll() {
-    return `This action returns all readlog`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} readlog`;
-  }
-
-  update(id: number, updateReadlogDto: UpdateReadlogDto) {
-    void updateReadlogDto;
-    return `This action updates a #${id} readlog`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} readlog`;
-  }
 }

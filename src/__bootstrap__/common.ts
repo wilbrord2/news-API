@@ -16,9 +16,5 @@ export function createCommonServerStart(app: INestApplication) {
     .enableVersioning({ type: VersioningType.URI })
     .useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }))
     .useGlobalFilters(new BaseResponseExceptionFilter())
-    .useGlobalInterceptors(
-      new ClassSerializerInterceptor(new Reflector(), {
-        strategy: 'excludeAll',
-      }),
-    );
+    .useGlobalInterceptors(new ClassSerializerInterceptor(new Reflector()));
 }

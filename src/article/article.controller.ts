@@ -3,7 +3,10 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
+  NotFoundException,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -18,18 +21,37 @@ import {
   OptionalAccessTokenGuard,
   RbacGuard,
 } from '../auth/guards';
-import { CurrentUser, Role, Roles } from '../__helpers__';
+import {
+  BaseResponseDto,
+  CurrentUser,
+  HttpExceptionSchema,
+  Role,
+  Roles,
+} from '../__helpers__';
 import { QueryArticlesDto } from './dto/query-articles.dto';
 import type { Request } from 'express';
 import type { AuthUser } from '../__helpers__/decorators/current-user.decorator';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
 
 @Controller('articles')
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
   @Post()
+  @ApiBody({ type: CreateArticleDto })
+  @ApiOperation({ summary: 'create an article' })
+  @ApiBearerAuth('access-token')
   @UseGuards(AccessTokenGuard, RbacGuard)
   @Roles(Role.Author)
+  @ApiResponse({
+    type: CreateArticleDto,
+    status: HttpStatus.OK,
+  })
   create(
     @CurrentUser() user: AuthUser,
     @Body() createArticleDto: CreateArticleDto,
@@ -38,11 +60,14 @@ export class ArticleController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'get public articles' })
   findAll(@Query() query: QueryArticlesDto) {
     return this.articleService.findPublic(query);
   }
 
   @Get('me')
+  @ApiOperation({ summary: 'get my articles' })
+  @ApiBearerAuth('access-token')
   @UseGuards(AccessTokenGuard, RbacGuard)
   @Roles(Role.Author)
   findMine(@CurrentUser() user: AuthUser, @Query() query: QueryArticlesDto) {
@@ -50,6 +75,7 @@ export class ArticleController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'get article by id' })
   @UseGuards(OptionalAccessTokenGuard)
   findOne(
     @Param('id') id: string,
@@ -60,7 +86,19 @@ export class ArticleController {
     return this.articleService.findPublicById(id, user?.sub ?? null, clientKey);
   }
 
+  // api to change article status, only allow author to change their own article status
+  @Patch(':id/status')
+  @ApiOperation({ summary: 'update article status' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(AccessTokenGuard, RbacGuard)
+  @Roles(Role.Author)
+  updateStatus(@Param('id') id: string, @CurrentUser() user: AuthUser) {
+    return this.articleService.updateStatus(id, user.sub);
+  }
+
   @Put(':id')
+  @ApiOperation({ summary: 'update article' })
+  @ApiBearerAuth('access-token')
   @UseGuards(AccessTokenGuard, RbacGuard)
   @Roles(Role.Author)
   update(
@@ -72,6 +110,8 @@ export class ArticleController {
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'delete article' })
+  @ApiBearerAuth('access-token')
   @UseGuards(AccessTokenGuard, RbacGuard)
   @Roles(Role.Author)
   remove(@Param('id') id: string, @CurrentUser() user: AuthUser) {

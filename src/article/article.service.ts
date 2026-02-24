@@ -12,6 +12,11 @@ import { Repository } from 'typeorm';
 import { BaseResponseDto, PaginatedResponseDto } from '../__helpers__';
 import { QueryArticlesDto } from './dto/query-articles.dto';
 import { ReadlogService } from '../readlog/readlog.service';
+import {
+  CreatedArticleResponseDto,
+  MineArticleListItemDto,
+  PublicArticleListItemDto,
+} from './dto/article-response.dto';
 
 @Injectable()
 export class ArticleService {
@@ -24,12 +29,12 @@ export class ArticleService {
   async create(
     authorId: string,
     createArticleDto: CreateArticleDto,
-  ): Promise<BaseResponseDto<unknown>> {
+  ): Promise<BaseResponseDto<CreatedArticleResponseDto>> {
     try {
       const article = this.articleRepository.create({
         ...createArticleDto,
         authorId,
-        status: createArticleDto.status ?? ArticleStatus.Draft,
+        status: ArticleStatus.Draft,
       });
 
       const saved = await this.articleRepository.save(article);
@@ -50,7 +55,7 @@ export class ArticleService {
 
   async findPublic(
     query: QueryArticlesDto,
-  ): Promise<PaginatedResponseDto<unknown>> {
+  ): Promise<PaginatedResponseDto<PublicArticleListItemDto>> {
     try {
       const pageNumber = query.pageNumber || 1;
       const pageSize = query.pageSize || 10;
@@ -125,7 +130,7 @@ export class ArticleService {
   async findMine(
     authorId: string,
     query: QueryArticlesDto,
-  ): Promise<PaginatedResponseDto<unknown>> {
+  ): Promise<PaginatedResponseDto<MineArticleListItemDto>> {
     try {
       const pageNumber = query.pageNumber || 1;
       const pageSize = query.pageSize || 10;
@@ -285,6 +290,45 @@ export class ArticleService {
       await this.articleRepository.save(article);
 
       return BaseResponseDto.ok('Article deleted successfully', null);
+    } catch (error) {
+      if (
+        error instanceof ForbiddenException ||
+        error instanceof NotFoundException
+      ) {
+        throw error;
+      }
+
+      console.log(error);
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async updateStatus(
+    articleId: string,
+    authorId: string,
+  ): Promise<BaseResponseDto<unknown>> {
+    try {
+      const article = await this.articleRepository.findOne({
+        where: { id: articleId },
+      });
+
+      if (!article || article.deletedAt) {
+        throw new NotFoundException('Article not found');
+      }
+
+      if (article.authorId !== authorId) {
+        throw new ForbiddenException('Forbidden');
+      }
+
+      article.status = ArticleStatus.Published;
+      const updated = await this.articleRepository.save(article);
+
+      return BaseResponseDto.ok('Article status updated successfully', {
+        id: updated.id,
+        title: updated.title,
+        category: updated.category,
+        status: updated.status,
+      });
     } catch (error) {
       if (
         error instanceof ForbiddenException ||
