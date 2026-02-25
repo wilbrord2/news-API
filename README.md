@@ -1,5 +1,3 @@
-
-
 ## Description
 
 The News API
@@ -14,10 +12,14 @@ $ npm install
 ## Compile and run the project
 
 ```bash
-# development
-$ npm run start
+# Environment Variable
+$ Setup .env file referring to .env.example file above
 
-# watch mode
+# Migration run
+$ npm run migration:generate
+$ npm run migration:run
+
+# run project
 $ npm run start:dev
 
 ```
@@ -29,10 +31,6 @@ $ npm run start:dev
 $ npm run test
 
 ```
+## This is why I choose nest JS
 
-## Stay in touch
-
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+I chose NestJS for its scalable architecture, TypeScript-first design, and clean structure. It enables building maintainable, enterprise grade backend applications with strong performance, modularity, and developer productivity.
