@@ -1,32 +1,32 @@
 import {
-	Column,
-	Entity,
-	JoinColumn,
-	ManyToOne,
-	PrimaryGeneratedColumn,
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Article } from '../../article/entities/article.entity';
 import { User } from '../../user/entities/user.entity';
 
 @Entity()
 export class Readlog {
-	@PrimaryGeneratedColumn('uuid')
-	id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-	@Column({ type: 'uuid' })
-	articleId: string;
+  @Column({ type: 'uuid' })
+  articleId: string;
 
-	@ManyToOne(() => Article, { nullable: false, onDelete: 'CASCADE' })
-	@JoinColumn({ name: 'articleId' })
-	article: Article;
+  @ManyToOne(() => Article, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'articleId' })
+  article: Article;
 
-	@Column({ type: 'uuid', nullable: true, default: null })
-	readerId: string | null;
+  @Column({ type: 'uuid', nullable: true })
+  readerId: string | null;
 
-	@ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
-	@JoinColumn({ name: 'readerId' })
-	reader: User | null;
+  @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'readerId' })
+  reader: User | null;
 
-	@Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-	readAt: Date;
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  readAt: Date;
 }

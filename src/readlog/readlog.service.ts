@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 import { Readlog } from './entities/readlog.entity';
 import { AnalyticsService } from '../analytics/analytics.service';
 
-
 @Injectable()
 export class ReadlogService {
   private readonly refreshProtectionWindowMs = 10_000;
@@ -82,5 +81,4 @@ export class ReadlogService {
       });
     });
   }
-
 }
